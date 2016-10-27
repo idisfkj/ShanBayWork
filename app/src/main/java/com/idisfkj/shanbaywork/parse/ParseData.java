@@ -3,6 +3,7 @@ package com.idisfkj.shanbaywork.parse;
 import android.content.Context;
 
 import com.idisfkj.shanbaywork.entity.Article;
+import com.idisfkj.shanbaywork.entity.WordsList;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * 文本解析类
  * Created by idisfkj on 16/10/27.
  * Email : idisfkj@qq.com.
  */
@@ -105,7 +107,8 @@ public class ParseData {
      *
      * @param context
      */
-    public static void parseWords(Context context) {
+    public static List<WordsList> parseWords(Context context) {
+        List<WordsList> lists = new ArrayList<>();
         try {
             InputStream is = context.getAssets().open("nce4_words.txt");
             BufferedReader reader = new BufferedReader(new InputStreamReader(is, "utf-8"));
@@ -113,29 +116,14 @@ public class ParseData {
             String line = reader.readLine();
             while ((line = reader.readLine()) != null) {
                 String[] str = line.split("\t");
-                switch (Integer.valueOf(str[1])) {
-                    case 0:
-                        words_0.add(str[0]);
-                        break;
-                    case 1:
-                        words_1.add(str[0]);
-                        break;
-                    case 2:
-                        words_2.add(str[0]);
-                        break;
-                    case 3:
-                        words_3.add(str[0]);
-                        break;
-                    case 4:
-                        words_4.add(str[0]);
-                        break;
-                    case 5:
-                        words_5.add(str[0]);
-                        break;
-                }
+                WordsList wordsList = new WordsList();
+                wordsList.setWord(str[0]);
+                wordsList.setLevel(Integer.valueOf(str[1]));
+                lists.add(wordsList);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return lists;
     }
 }
