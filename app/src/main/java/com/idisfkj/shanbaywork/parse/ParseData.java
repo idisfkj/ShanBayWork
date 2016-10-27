@@ -2,6 +2,10 @@ package com.idisfkj.shanbaywork.parse;
 
 import android.content.Context;
 
+import com.idisfkj.shanbaywork.App;
+import com.idisfkj.shanbaywork.dao.ArticleDataHelper;
+import com.idisfkj.shanbaywork.dao.DataBaseHelper;
+import com.idisfkj.shanbaywork.dao.WordsListDataHelper;
 import com.idisfkj.shanbaywork.entity.Article;
 import com.idisfkj.shanbaywork.entity.WordsList;
 
@@ -9,8 +13,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 文本解析类
@@ -18,12 +20,7 @@ import java.util.List;
  * Email : idisfkj@qq.com.
  */
 public class ParseData {
-    public static List<String> words_0 = new ArrayList<>();
-    public static List<String> words_1 = new ArrayList<>();
-    public static List<String> words_2 = new ArrayList<>();
-    public static List<String> words_3 = new ArrayList<>();
-    public static List<String> words_4 = new ArrayList<>();
-    public static List<String> words_5 = new ArrayList<>();
+    private static DataBaseHelper dataBaseHelper = new DataBaseHelper(App.mContext);
 
     private ParseData() {
     }
@@ -34,8 +31,8 @@ public class ParseData {
      * @param context
      * @return
      */
-    public static List<Article> parseArticles(Context context) {
-        List<Article> list = new ArrayList<>();
+    public static void parseArticles(Context context) {
+        ArticleDataHelper articleHelper = new ArticleDataHelper(dataBaseHelper);
         try {
             InputStream is = context.getAssets().open("nce4_content.txt");
             BufferedReader reader = new BufferedReader(new InputStreamReader(is, "utf-8"));
@@ -66,7 +63,7 @@ public class ParseData {
                     article.setContent(content.toString());
                     article.setNewWords(newWords.toString());
                     article.setTranslation(translation.toString());
-                    list.add(article);
+                    articleHelper.insert(article);
 
                     //清空数据缓存
                     title = new StringBuffer();
@@ -99,7 +96,6 @@ public class ParseData {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return list;
     }
 
     /**
@@ -107,8 +103,8 @@ public class ParseData {
      *
      * @param context
      */
-    public static List<WordsList> parseWords(Context context) {
-        List<WordsList> lists = new ArrayList<>();
+    public static void parseWords(Context context) {
+        WordsListDataHelper wordsHelper = new WordsListDataHelper(dataBaseHelper);
         try {
             InputStream is = context.getAssets().open("nce4_words.txt");
             BufferedReader reader = new BufferedReader(new InputStreamReader(is, "utf-8"));
@@ -119,11 +115,10 @@ public class ParseData {
                 WordsList wordsList = new WordsList();
                 wordsList.setWord(str[0]);
                 wordsList.setLevel(Integer.valueOf(str[1]));
-                lists.add(wordsList);
+                wordsHelper.insert(wordsList);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return lists;
     }
 }

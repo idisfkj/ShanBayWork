@@ -9,6 +9,7 @@ import android.util.Log;
 import com.idisfkj.shanbaywork.entity.Article;
 
 /**
+ * 文章数据库操作类
  * Created by idisfkj on 16/10/27.
  * Email : idisfkj@qq.com.
  */
@@ -50,14 +51,15 @@ public class ArticleDataHelper implements EntityDataHelper<Article> {
     @Override
     public Cursor query(int id) {
         synchronized (DBLock) {
-            String[] colunms = new String[]{ArticleInfo.TITLE
+            String[] colunms = new String[]{ArticleInfo._ID
+                    ,ArticleInfo.TITLE
                     , ArticleInfo.CONTENT
                     , ArticleInfo.NEWWORDS
                     , ArticleInfo.TRANSLATION
             };
             Cursor cursor = helper.getReadableDatabase().query(ArticleInfo.TABLE_NAME
-                    , colunms, ArticleInfo._ID + "=?"
-                    , new String[]{String.valueOf(id)}, null, null, ArticleInfo._ID);
+                    , colunms,null
+                    , null, null, null, ArticleInfo._ID);
             return cursor;
         }
     }

@@ -33,4 +33,9 @@ public class WelcomeActivity extends AppCompatActivity {
             }
         }, 3000);
     }
+
+    @Override
+    public void onBackPressed() {
+        //防止按回退键退出
+    }
 }
