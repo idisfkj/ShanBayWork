@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">扇贝英语</string>
+    <string name="dialog_message">正在初始化数据,请稍后...</string>
+    <string name="dialog_title">数据初始化</string>
 </resources>
