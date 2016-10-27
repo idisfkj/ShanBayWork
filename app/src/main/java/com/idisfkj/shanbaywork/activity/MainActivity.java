@@ -2,6 +2,7 @@ package com.idisfkj.shanbaywork.activity;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
@@ -18,6 +19,7 @@ import com.idisfkj.shanbaywork.R;
 import com.idisfkj.shanbaywork.adapter.ArticleListAdapter;
 import com.idisfkj.shanbaywork.dao.ArticleDataHelper;
 import com.idisfkj.shanbaywork.dao.DataBaseHelper;
+import com.idisfkj.shanbaywork.entity.Article;
 import com.idisfkj.shanbaywork.parse.ParseData;
 
 public class MainActivity extends AppCompatActivity {
@@ -45,6 +47,20 @@ public class MainActivity extends AppCompatActivity {
         adapter = new ArticleListAdapter(this, cursor);
         mRecyclerView.setAdapter(adapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        adapter.setOnItemClickListener(new ArticleListAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                cursor.moveToPosition(position);
+                Intent intent = new Intent(MainActivity.this, ArticleContentActivity.class);
+                String title = cursor.getString(cursor.getColumnIndex(ArticleDataHelper.ArticleInfo.TITLE));
+                String content = cursor.getString(cursor.getColumnIndex(ArticleDataHelper.ArticleInfo.CONTENT));
+                String newWords = cursor.getString(cursor.getColumnIndex(ArticleDataHelper.ArticleInfo.NEWWORDS));
+                String translation = cursor.getString(cursor.getColumnIndex(ArticleDataHelper.ArticleInfo.TRANSLATION));
+                Article article = new Article(title.split("#")[1], content, newWords, translation);
+                intent.putExtra("article", article);
+                startActivity(intent);
+            }
+        });
     }
 
     private Handler mHandler = new Handler() {

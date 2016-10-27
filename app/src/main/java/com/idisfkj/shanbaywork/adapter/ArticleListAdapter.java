@@ -18,6 +18,7 @@ import com.idisfkj.shanbaywork.dao.ArticleDataHelper;
  */
 public class ArticleListAdapter extends RecyclerViewCursorBaseAdapter<ArticleListAdapter.ArticleListViewHolder> {
     private LayoutInflater mLayoutInflater;
+    private OnItemClickListener itemClickListener;
 
     public ArticleListAdapter(Context context, Cursor cursor) {
         super(context, cursor);
@@ -29,6 +30,13 @@ public class ArticleListAdapter extends RecyclerViewCursorBaseAdapter<ArticleLis
         String title = cursor.getString(cursor.getColumnIndex(ArticleDataHelper.ArticleInfo.TITLE));
         String[] split = title.split("#");
         holder.articleTitle.setText(split[0] + "\n" + split[1] + "\n" + split[2]);
+        final int position = cursor.getPosition();
+        holder.articleTitle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                itemClickListener.onItemClick(position);
+            }
+        });
     }
 
     @Override
@@ -44,5 +52,13 @@ public class ArticleListAdapter extends RecyclerViewCursorBaseAdapter<ArticleLis
             super(itemView);
             articleTitle = (TextView) itemView.findViewById(R.id.article_list_title);
         }
+    }
+
+    public interface OnItemClickListener {
+        void onItemClick(int position);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        itemClickListener = listener;
     }
 }

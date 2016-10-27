@@ -1,11 +1,13 @@
 package com.idisfkj.shanbaywork.entity;
 
+import java.io.Serializable;
+
 /**
  * 文章实体类
  * Created by idisfkj on 16/10/27.
  * Email : idisfkj@qq.com.
  */
-public class Article {
+public class Article implements Serializable{
     private String title;
     private String content;
     private String newWords;
