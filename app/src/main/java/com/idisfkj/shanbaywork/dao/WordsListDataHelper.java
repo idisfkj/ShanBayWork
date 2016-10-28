@@ -37,7 +37,7 @@ public class WordsListDataHelper implements EntityDataHelper<WordsList> {
         synchronized (DBLock) {
             String[] columns = new String[]{WordsListInfo._ID, WordsListInfo.WORD};
             Cursor cursor = helper.getReadableDatabase().query(WordsListInfo.TABLE_NAME
-                    , columns, WordsListInfo.LEVEL + "=?"
+                    , columns, WordsListInfo.LEVEL + "<=?"
                     , new String[]{String.valueOf(id)}
                     , null, null, WordsListInfo._ID);
             return cursor;
