@@ -18,10 +18,10 @@ import com.idisfkj.shanbaywork.R;
 public class NewWordsFragment extends Fragment {
     private TextView articleNewWords;
 
-    public static TranslationFragment getInstance(String translation) {
+    public static NewWordsFragment getInstance(String newWords) {
         Bundle bundle = new Bundle();
-        bundle.putString("translation", translation);
-        TranslationFragment fragment = new TranslationFragment();
+        bundle.putString("newWords", newWords);
+        NewWordsFragment fragment = new NewWordsFragment();
         fragment.setArguments(bundle);
         return fragment;
     }

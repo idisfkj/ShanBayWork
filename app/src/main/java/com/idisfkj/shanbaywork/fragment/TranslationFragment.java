@@ -6,8 +6,8 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
+import com.idisfkj.shanbaywork.JustifyTextView;
 import com.idisfkj.shanbaywork.R;
 
 /**
@@ -16,7 +16,7 @@ import com.idisfkj.shanbaywork.R;
  * Email : idisfkj@qq.com.
  */
 public class TranslationFragment extends Fragment {
-    private TextView articleTranslation;
+    private JustifyTextView articleTranslation;
 
     public static TranslationFragment getInstance(String translation) {
         Bundle bundle = new Bundle();
@@ -30,7 +30,7 @@ public class TranslationFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_translation, null);
-        articleTranslation = (TextView) view.findViewById(R.id.article_translation);
+        articleTranslation = (JustifyTextView) view.findViewById(R.id.article_translation);
         String translation = getArguments().getString("translation", "");
         articleTranslation.setText(translation);
         return view;

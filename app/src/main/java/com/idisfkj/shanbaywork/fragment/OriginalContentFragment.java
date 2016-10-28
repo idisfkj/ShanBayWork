@@ -11,8 +11,8 @@ import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextPaint;
 import android.text.method.LinkMovementMethod;
-import android.text.style.BackgroundColorSpan;
 import android.text.style.ClickableSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,12 +22,14 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.idisfkj.shanbaywork.App;
+import com.idisfkj.shanbaywork.JustifyTextView;
 import com.idisfkj.shanbaywork.R;
 import com.idisfkj.shanbaywork.dao.DataBaseHelper;
 import com.idisfkj.shanbaywork.dao.WordsListDataHelper;
 
 import java.text.BreakIterator;
 import java.util.Locale;
+import java.util.TreeMap;
 
 /**
  * 原文界面
@@ -35,13 +37,14 @@ import java.util.Locale;
  * Email : idisfkj@qq.com.
  */
 public class OriginalContentFragment extends Fragment {
-    private TextView articalOriContent;
+    private JustifyTextView articalOriContent;
     private SeekBar seekBar;
     private Switch aSwitch;
     private TextView textLevel;
     private String originalContent;
     private SpannableStringBuilder spannableStringBuilder;
     private WordsListDataHelper helper;
+    private TreeMap<Integer, Integer> wordList = new TreeMap<>();
 
     public static OriginalContentFragment getInstance(String content) {
         Bundle bundle = new Bundle();
@@ -67,7 +70,7 @@ public class OriginalContentFragment extends Fragment {
     }
 
     public void initData(View view) {
-        articalOriContent = (TextView) view.findViewById(R.id.article_original_content);
+        articalOriContent = (JustifyTextView) view.findViewById(R.id.article_original_content);
         seekBar = (SeekBar) view.findViewById(R.id.seek_bar);
         aSwitch = (Switch) view.findViewById(R.id.switch_bar);
         textLevel = (TextView) view.findViewById(R.id.text_level);
@@ -112,6 +115,7 @@ public class OriginalContentFragment extends Fragment {
                     //还原文本
                     articalOriContent.setText(originalContent);
                     clickOnTheHighLighted(originalContent, articalOriContent);
+                    articalOriContent.setWordList(null);
                 }
             }
         });
@@ -150,6 +154,8 @@ public class OriginalContentFragment extends Fragment {
     }
 
     public void setClickSpan(Cursor cursor) {
+        //清除数据,重新提取
+        wordList.clear();
         while (cursor.moveToNext()) {
             String word = cursor.getString(cursor.getColumnIndex(WordsListDataHelper.WordsListInfo.WORD));
             int start = originalContent.indexOf(word);
@@ -166,10 +172,10 @@ public class OriginalContentFragment extends Fragment {
                     //单词复数形式
                     end++;
                 }
-                spannableStringBuilder.setSpan(new BackgroundColorSpan(getResources().getColor(R.color.colorPrimaryDark))
-                        , start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                wordList.put(start, end);
             }
         }
+        articalOriContent.setWordList(wordList);
     }
 
     /**
@@ -206,6 +212,10 @@ public class OriginalContentFragment extends Fragment {
                 TextView textView = (TextView) widget;
                 //获取高亮文本
                 textView.getText().subSequence(textView.getSelectionStart(), textView.getSelectionEnd()).toString();
+                Log.v("TAG", textView.getSelectionStart() + " "
+                        + textView.getSelectionEnd() + " "
+                        + originalContent.substring(textView.getSelectionStart(), textView.getSelectionEnd()));
+                articalOriContent.setHightLightWord(textView.getSelectionStart(), textView.getSelectionEnd());
             }
 
             public void updateDrawState(TextPaint ds) {
@@ -223,5 +233,13 @@ public class OriginalContentFragment extends Fragment {
         //保存数据
         outState.putInt("level", Integer.valueOf(seekBar.getProgress()));
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onDestroy() {
+        //清除
+        articalOriContent.setHightLightWord(Integer.MAX_VALUE, Integer.MAX_VALUE);
+        articalOriContent.setWordList(null);
+        super.onDestroy();
     }
 }
