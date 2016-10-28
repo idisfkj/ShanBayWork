@@ -12,7 +12,6 @@ import android.text.Spanned;
 import android.text.TextPaint;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,10 +21,10 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.idisfkj.shanbaywork.App;
-import com.idisfkj.shanbaywork.JustifyTextView;
 import com.idisfkj.shanbaywork.R;
 import com.idisfkj.shanbaywork.dao.DataBaseHelper;
 import com.idisfkj.shanbaywork.dao.WordsListDataHelper;
+import com.idisfkj.shanbaywork.view.JustifyTextView;
 
 import java.text.BreakIterator;
 import java.util.Locale;
@@ -166,12 +165,10 @@ public class OriginalContentFragment extends Fragment {
             int end = start + word.length();
 
             //过滤不完整的单词,例如:目标单词为work,文章中可能存在network单词,但不符合
-            if (originalContent.charAt(start - 1) == ' '
-                    && (originalContent.charAt(end + 1) == 's' || originalContent.charAt(end + 1) == ' ')) {
-                if (originalContent.charAt(end) == 's') {
-                    //单词复数形式
-                    end++;
-                }
+            if ((Character.toLowerCase(originalContent.charAt(start - 1)) < 'a'
+                    || Character.toLowerCase(originalContent.charAt(start - 1)) > 'z')
+                    && (Character.toLowerCase(originalContent.charAt(end)) < 'a'
+                    || Character.toLowerCase(originalContent.charAt(end)) > 'z')) {
                 wordList.put(start, end);
             }
         }
@@ -198,13 +195,13 @@ public class OriginalContentFragment extends Fragment {
         for (int end = iterator.next(); end != BreakIterator.DONE; start = end, end = iterator.next()) {
             String possibleWord = content.toString().substring(start, end);
             if (Character.isLetterOrDigit(possibleWord.charAt(0))) {
-                ClickableSpan clickSpan = getClickableSpan(possibleWord);
+                ClickableSpan clickSpan = getClickableSpan();
                 spannable.setSpan(clickSpan, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
         }
     }
 
-    public ClickableSpan getClickableSpan(final String word) {
+    public ClickableSpan getClickableSpan() {
         return new ClickableSpan() {
             @Override
             public void onClick(View widget) {
@@ -212,9 +209,9 @@ public class OriginalContentFragment extends Fragment {
                 TextView textView = (TextView) widget;
                 //获取高亮文本
                 textView.getText().subSequence(textView.getSelectionStart(), textView.getSelectionEnd()).toString();
-                Log.v("TAG", textView.getSelectionStart() + " "
-                        + textView.getSelectionEnd() + " "
-                        + originalContent.substring(textView.getSelectionStart(), textView.getSelectionEnd()));
+//                Log.v("TAG", textView.getSelectionStart() + " "
+//                        + textView.getSelectionEnd() + " "
+//                        + originalContent.substring(textView.getSelectionStart(), textView.getSelectionEnd()));
                 articalOriContent.setHightLightWord(textView.getSelectionStart(), textView.getSelectionEnd());
             }
 

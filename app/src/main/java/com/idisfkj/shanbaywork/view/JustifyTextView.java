@@ -1,4 +1,4 @@
-package com.idisfkj.shanbaywork;
+package com.idisfkj.shanbaywork.view;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -9,6 +9,8 @@ import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.widget.TextView;
+
+import com.idisfkj.shanbaywork.R;
 
 import java.util.TreeMap;
 

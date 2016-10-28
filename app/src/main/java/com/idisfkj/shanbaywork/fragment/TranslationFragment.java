@@ -7,7 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.idisfkj.shanbaywork.JustifyTextView;
+import com.idisfkj.shanbaywork.view.JustifyTextView;
 import com.idisfkj.shanbaywork.R;
 
 /**
