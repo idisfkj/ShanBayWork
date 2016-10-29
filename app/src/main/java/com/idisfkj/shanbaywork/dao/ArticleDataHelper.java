@@ -8,6 +8,8 @@ import android.util.Log;
 
 import com.idisfkj.shanbaywork.entity.Article;
 
+import java.util.List;
+
 /**
  * 文章数据库操作类
  * Created by idisfkj on 16/10/27.
@@ -15,7 +17,6 @@ import com.idisfkj.shanbaywork.entity.Article;
  */
 public class ArticleDataHelper implements EntityDataHelper<Article> {
     private DataBaseHelper helper;
-    private Object DBLock = new Object();
 
     public ArticleDataHelper(DataBaseHelper helper) {
         this.helper = helper;
@@ -50,7 +51,6 @@ public class ArticleDataHelper implements EntityDataHelper<Article> {
 
     @Override
     public Cursor query(int id) {
-        synchronized (DBLock) {
             String[] colunms = new String[]{ArticleInfo._ID
                     ,ArticleInfo.TITLE
                     , ArticleInfo.CONTENT
@@ -61,22 +61,20 @@ public class ArticleDataHelper implements EntityDataHelper<Article> {
                     , colunms,null
                     , null, null, null, ArticleInfo._ID);
             return cursor;
-        }
     }
 
     @Override
-    public void insert(Article article) {
-        synchronized (DBLock) {
-            SQLiteDatabase db = helper.getWritableDatabase();
-            db.beginTransaction();
-            try {
-                db.insert(ArticleInfo.TABLE_NAME, null, getContentValues(article));
-                db.setTransactionSuccessful();
-            } catch (Exception e) {
-                Log.e("TAG", e.getMessage());
-            } finally {
-                db.endTransaction();
-            }
+    public void bulkInsert(List<Article> articles) {
+        SQLiteDatabase db = helper.getWritableDatabase();
+        db.beginTransaction();
+        try {
+            for (Article article : articles)
+            db.insert(ArticleInfo.TABLE_NAME, null, getContentValues(article));
+            db.setTransactionSuccessful();
+        }catch (Exception e){
+            Log.e("TAG", e.getMessage());
+        }finally {
+            db.endTransaction();
         }
     }
 }

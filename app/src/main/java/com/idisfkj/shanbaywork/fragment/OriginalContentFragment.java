@@ -7,7 +7,6 @@ import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.Spannable;
-import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextPaint;
 import android.text.method.LinkMovementMethod;
@@ -41,9 +40,9 @@ public class OriginalContentFragment extends Fragment {
     private Switch aSwitch;
     private TextView textLevel;
     private String originalContent;
-    private SpannableStringBuilder spannableStringBuilder;
     private WordsListDataHelper helper;
     private TreeMap<Integer, Integer> wordList = new TreeMap<>();
+    private final int UPDATE = 1;
 
     public static OriginalContentFragment getInstance(String content) {
         Bundle bundle = new Bundle();
@@ -75,8 +74,6 @@ public class OriginalContentFragment extends Fragment {
         textLevel = (TextView) view.findViewById(R.id.text_level);
         originalContent = getArguments().getString("originalContent", "");
         articalOriContent.setText(originalContent);
-        clickOnTheHighLighted(originalContent, articalOriContent);
-        spannableStringBuilder = new SpannableStringBuilder(originalContent);
         //默认不能点击
         seekBar.setEnabled(false);
     }
@@ -112,8 +109,7 @@ public class OriginalContentFragment extends Fragment {
                 } else {
                     seekBar.setEnabled(false);
                     //还原文本
-                    articalOriContent.setText(originalContent);
-                    clickOnTheHighLighted(originalContent, articalOriContent);
+                    articalOriContent.invalidate();
                     articalOriContent.setWordList(null);
                 }
             }
@@ -124,10 +120,9 @@ public class OriginalContentFragment extends Fragment {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            if (msg.what == 0) {
-                articalOriContent.setText(spannableStringBuilder);
+            if (msg.what == UPDATE) {
                 //更新高亮点击的文本
-                clickOnTheHighLighted(spannableStringBuilder, articalOriContent);
+                articalOriContent.invalidate();
             }
         }
     };
@@ -142,17 +137,21 @@ public class OriginalContentFragment extends Fragment {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                //获取最新需要高亮的文本
-                spannableStringBuilder = new SpannableStringBuilder(originalContent);
                 if (helper == null)
                     helper = new WordsListDataHelper(new DataBaseHelper(App.mContext));
-                setClickSpan(helper.query(progress));
-                mHandler.sendEmptyMessage(0);
+                //获取单词列表中的单词
+                getWordsList(helper.query(progress));
+                mHandler.sendEmptyMessage(UPDATE);
             }
         }).start();
     }
 
-    public void setClickSpan(Cursor cursor) {
+    /**
+     * 获取单词列表中的单词
+     *
+     * @param cursor
+     */
+    public void getWordsList(Cursor cursor) {
         //清除数据,重新提取
         wordList.clear();
         while (cursor.moveToNext()) {

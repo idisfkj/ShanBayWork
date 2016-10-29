@@ -26,8 +26,12 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private ArticleListAdapter adapter;
     private Cursor cursor;
-    private final int FINISH = 1;
+    private final int FINISH_WORDS = 1;
+    private final int FINISH_ARTICLES = 2;
     private long time;
+    private boolean isParseArticles = false;
+    private boolean isParseWords = false;
+    private ProgressDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,8 +71,20 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            if (msg.what == FINISH)
+            switch(msg.what){
+                case FINISH_WORDS:
+                    isParseWords=true;
+                    break;
+                case FINISH_ARTICLES:
+                    isParseArticles=true;
+                    break;
+            }
+
+            if(isParseWords&&isParseArticles){
+                App.sp.edit().putBoolean(App.FIRST, true).commit();
+                dialog.cancel();
                 mRecyclerView.setVisibility(View.VISIBLE);
+            }
         }
     };
 
@@ -77,21 +93,25 @@ public class MainActivity extends AppCompatActivity {
      */
     public void firstOpenInitData(final Context context) {
         mRecyclerView.setVisibility(View.GONE);
-        final ProgressDialog dialog = showProgressDialog();
+        showProgressDialog();
         new Thread(new Runnable() {
             @Override
             public void run() {
                 ParseData.parseArticles(context);
+                mHandler.sendEmptyMessage(FINISH_ARTICLES);
+            }
+        }).start();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
                 ParseData.parseWords(context);
-                App.sp.edit().putBoolean(App.FIRST, true).commit();
-                dialog.cancel();
-                mHandler.sendEmptyMessage(FINISH);
+                mHandler.sendEmptyMessage(FINISH_WORDS);
             }
         }).start();
     }
 
     public ProgressDialog showProgressDialog() {
-        ProgressDialog dialog = new ProgressDialog(this);
+        dialog = new ProgressDialog(this);
         dialog.setMessage(getString(R.string.dialog_message));
         dialog.setTitle(getString(R.string.dialog_title));
         dialog.setCanceledOnTouchOutside(false);

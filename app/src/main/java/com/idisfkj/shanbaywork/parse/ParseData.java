@@ -13,6 +13,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 文本解析类
@@ -33,6 +35,7 @@ public class ParseData {
      */
     public static void parseArticles(Context context) {
         ArticleDataHelper articleHelper = new ArticleDataHelper(dataBaseHelper);
+        List<Article> articles = new ArrayList<>();
         try {
             InputStream is = context.getAssets().open("nce4_content.txt");
             BufferedReader reader = new BufferedReader(new InputStreamReader(is, "utf-8"));
@@ -63,7 +66,8 @@ public class ParseData {
                     article.setContent(content.toString());
                     article.setNewWords(newWords.toString());
                     article.setTranslation(translation.toString());
-                    articleHelper.insert(article);
+                    articles.add(article);
+//                    Log.v("TAG",article.toString());
 
                     //清空数据缓存
                     title = new StringBuffer();
@@ -93,6 +97,8 @@ public class ParseData {
                     }
                 }
             }
+            //插入到数据库
+            articleHelper.bulkInsert(articles);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -105,6 +111,7 @@ public class ParseData {
      */
     public static void parseWords(Context context) {
         WordsListDataHelper wordsHelper = new WordsListDataHelper(dataBaseHelper);
+        List<WordsList> wordsLists = new ArrayList<>();
         try {
             InputStream is = context.getAssets().open("nce4_words.txt");
             BufferedReader reader = new BufferedReader(new InputStreamReader(is, "utf-8"));
@@ -115,8 +122,11 @@ public class ParseData {
                 WordsList wordsList = new WordsList();
                 wordsList.setWord(str[0]);
                 wordsList.setLevel(Integer.valueOf(str[1]));
-                wordsHelper.insert(wordsList);
+                wordsLists.add(wordsList);
+//                Log.v("TAG",wordsList.toString());
             }
+            //插入到数据库
+            wordsHelper.bulkInsert(wordsLists);
         } catch (IOException e) {
             e.printStackTrace();
         }

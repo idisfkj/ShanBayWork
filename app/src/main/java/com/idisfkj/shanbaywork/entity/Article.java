@@ -54,4 +54,14 @@ public class Article implements Serializable{
     public void setTranslation(String translation) {
         this.translation = translation;
     }
+
+    @Override
+    public String toString() {
+        return "Article{" +
+                "title='" + title + '\'' +
+                ", content='" + content + '\'' +
+                ", newWords='" + newWords + '\'' +
+                ", translation='" + translation + '\'' +
+                '}';
+    }
 }

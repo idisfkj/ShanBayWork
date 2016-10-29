@@ -8,6 +8,8 @@ import android.util.Log;
 
 import com.idisfkj.shanbaywork.entity.WordsList;
 
+import java.util.List;
+
 /**
  * 单词列表数据库操作类
  * Created by idisfkj on 16/10/27.
@@ -15,7 +17,6 @@ import com.idisfkj.shanbaywork.entity.WordsList;
  */
 public class WordsListDataHelper implements EntityDataHelper<WordsList> {
     private DataBaseHelper helper;
-    private Object DBLock = new Object();
 
     public WordsListDataHelper(DataBaseHelper helper) {
         this.helper = helper;
@@ -34,29 +35,27 @@ public class WordsListDataHelper implements EntityDataHelper<WordsList> {
 
     @Override
     public Cursor query(int id) {
-        synchronized (DBLock) {
             String[] columns = new String[]{WordsListInfo._ID, WordsListInfo.WORD};
             Cursor cursor = helper.getReadableDatabase().query(WordsListInfo.TABLE_NAME
                     , columns, WordsListInfo.LEVEL + "<=?"
                     , new String[]{String.valueOf(id)}
                     , null, null, WordsListInfo._ID);
             return cursor;
-        }
     }
 
     @Override
-    public void insert(WordsList wordsList) {
-        synchronized (DBLock) {
-            SQLiteDatabase db = helper.getWritableDatabase();
-            db.beginTransaction();
-            try {
+    public void bulkInsert(List<WordsList> wordsLists) {
+        SQLiteDatabase db = helper.getWritableDatabase();
+        db.beginTransaction();
+        try {
+            for (WordsList wordsList : wordsLists){
                 db.insert(WordsListInfo.TABLE_NAME, null, getContentValues(wordsList));
-                db.setTransactionSuccessful();
-            } catch (Exception e) {
-                Log.e("TAG", e.getMessage());
-            } finally {
-                db.endTransaction();
             }
+            db.setTransactionSuccessful();
+        }catch (Exception e){
+            Log.e("TAG", e.getMessage());
+        }finally {
+            db.endTransaction();
         }
     }
 

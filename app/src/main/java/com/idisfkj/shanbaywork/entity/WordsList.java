@@ -32,4 +32,12 @@ public class WordsList {
     public void setLevel(int level) {
         this.level = level;
     }
+
+    @Override
+    public String toString() {
+        return "WordsList{" +
+                "word='" + word + '\'' +
+                ", level=" + level +
+                '}';
+    }
 }
